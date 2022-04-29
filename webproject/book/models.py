@@ -12,7 +12,14 @@ class Book(models.Model):
     name = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
 
+    def __str__(self):
+        #显示书籍名字
+        return self.name
+
 class PeopleInfo(models.Model):
     name = models.CharField(max_length=100)
     gender = models.BooleanField()
     book = models.ForeignKey(Book,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
