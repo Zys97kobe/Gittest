@@ -7,6 +7,8 @@ view 函数
 '''
 # Create your views here.
 def index(request):
-
-
-    return HttpResponse("VIEW函数，返回HttpResponse")
+    context = {
+        "name":"zhangyongsheng",
+        "age":"18",
+    }
+    return render(request,'book/index.html',context = context)
