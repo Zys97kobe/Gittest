@@ -36,9 +36,22 @@ class Book(models.Model):
         #显示书籍名字
         return self.name
 
+
 class PeopleInfo(models.Model):
-    name = models.CharField(max_length=100)
-    gender = models.BooleanField()
+    GENDER_CHOICE = {
+        (1,'male'),
+        (2,'feamle'),
+    }
+
+    name = models.CharField(max_length=100,unique=True)
+    gender = models.SmallIntegerField(choices=GENDER_CHOICE,default=1)
+    description = models.CharField(max_length=100,null=True)
+    is_delete = models.BooleanField(default=False)
+
+    # 外键，系统自动添加 _id,
+    # 外键的级联操作，主表和从表，1对多
+    # 级联操作：当主表的数据被删除后，从表的外键该怎么处理：
+    # SET_NULL(设置为空) , CASCADE(一起删除) , SET_DEFAULT(设为默认值) ,DO_NOTHING(不做处理) ,PROTECT(保护主表数据不被删除)
     book = models.ForeignKey(Book,on_delete=models.CASCADE)
 
     def __str__(self):
