@@ -94,12 +94,12 @@ from django.db.models import F
 Book.objects.filter(readcount__gt=F('commentcount'))
 
 # Q对象
-# 并且查询
+# 与语法，并且查询
 # 查询阅读量大于20，并且编号小于3的图书
 Book.objects.filter(readcount__gt=20).filter(id__lt=3)
 Book.objects.filter(readcount__gt=20,id__lt=3)
 
-#或者查询
+# 或语法，或者查询
 from django.db.models import Q
 # 查询阅读量大于20，或者编号小于3的图书
 Book.objects.filter(Q(readcount__gt=20)|Q(id__lt=3))
@@ -108,3 +108,74 @@ Book.objects.filter(Q(readcount__gt=20)&Q(id__lt=3))
 
 # 非语法，not
 Book.objects.filter(~Q(id=3))
+
+# 聚合函数
+# Sum Max Min Avg Count
+# 语法：类名.objects.aggregate(聚合函数("字段名"))
+from django.db.models import Sum,Max,Min,Avg,Count
+Book.objects.aggregate(Sum('readcount'))
+
+# 排序
+# SQL语句：select * from table order by "字段" 默认升序，
+# select * from table order by "字段" desc为降序
+# 升序
+Book.objects.all().order_by("readcount")
+# 降序
+Book.objects.all().order_by("-readcount")
+
+
+'''**************级联查询***************'''
+# 关联查询
+# 查询书籍为1的所有人物信息
+# 获取id为1的书籍：
+# 【一对多】的关系模型中，在‘一’的模型中，
+# 系统自动添加一个 [关联模型类名]_set 以及 [关联模型类名] （隐藏添加）
+
+book= Book.objects.get(id=1)
+book.peopleinfo_set.all()
+
+# 查询人物为1的书籍信息
+from book.models import PeopleInfo
+people = PeopleInfo.objects.get(id=1)
+people.book
+
+# 关联过滤查询
+# 语法：
+    #模型类名.objects.filter(关联模型类名小写__字段名__运算符=值)
+
+# 查询图书，要求图书人物为郭靖
+Book.objects.filter(peopleinfo__name__exact='郭靖')
+
+# 查询图书，要求图书中人物的描述包含”八“
+Book.objects.filter(peopleinfo__description__contains='八')
+
+# 查询书名为”天龙八部“的所有人物
+PeopleInfo.objects.filter(book__name__exact = '天龙八部')
+
+
+# 查询图书阅读量大于30的所有人物
+PeopleInfo.objects.filter(book__readcount__gt = 30)
+
+'''**************查询结果集***************'''
+# QuerySet
+# all() fiter() exclude() order_by()
+# 两大特性：
+# 惰性执行：不用不查询
+book = Book.objects.all()
+# 此时没有进行SQL查询
+Book.objects.all()
+# 此时进行SQL查询
+
+
+# 缓存
+# 列表推导式
+
+[book.id for book in Book.objects.all()]
+[book.id for book in Book.objects.all()]
+# 执行几次就需要查询几次
+
+
+books= Book.objects.all()
+[book.id for book in books]
+# 不管执行几次 都只需要查询一次 因为有缓存
+
